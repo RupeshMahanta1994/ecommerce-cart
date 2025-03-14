@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
 import Sidebar from "@/components/Sidebar";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,16 +30,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className=" w-full">
-          <TopBar />
-          <div className="grid grid-cols-[8%_auto] gap-4  border border-gray-300">
-            <Sidebar />
-            <div >
-              {children}
-            </div>
-          </div>
+        <header>
 
-        </div>
+          <TopBar />
+        </header>
+        <main className="grid grid-cols-[8%_auto] gap-4  border border-gray-300">
+          <Sidebar />
+          <div>
+            <Suspense fallback={<div>Loading...</div>}>
+              {children}
+            </Suspense>
+          </div>
+        </main>
+
+
 
       </body>
     </html>
