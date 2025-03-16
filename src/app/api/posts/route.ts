@@ -4,7 +4,7 @@ import pool from "@/app/lib/db";
 export async function POST(req: Request) {
     try {
         const formData = await req.formData();
-        const userId = formData.get("user_id");
+        const userId = formData.get("user_id") ;
         const caption = formData.get("caption") as string | null;
         const imageFile = formData.get("image") as File | null;
 
@@ -31,7 +31,25 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-      const [posts] = await pool.query("SELECT * FROM posts");
+    const [posts] = await pool.query(`
+        SELECT 
+            posts.*, 
+            COUNT(comments.id) AS comment_count, 
+            COUNT(likes.id) AS like_count,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'id', comments.id,
+                    'text', comments.content,
+                    'user_id', comments.user_id,
+                    'created_at', comments.created_at
+                )
+            ) AS comments
+        FROM posts
+        LEFT JOIN comments ON posts.id = comments.post_id
+        LEFT JOIN likes ON posts.id = likes.post_id
+        GROUP BY posts.id
+    `);
+    
 
       return new Response(JSON.stringify(posts), { status: 200 });
   } catch (error) {
