@@ -1,42 +1,41 @@
 import pool from "@/app/lib/db";
-import { NextResponse } from "next/server";
+
+
+export async function POST(req: Request) {
+    try {
+        const formData = await req.formData();
+        const userId = formData.get("user_id");
+        const caption = formData.get("caption") as string | null;
+        const imageFile = formData.get("image") as File | null;
+
+        if (!userId || !imageFile) {
+            return new Response(JSON.stringify({ message: "User ID and image are required" }), { status: 400 });
+        }
+
+        // Convert image to binary
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const imageBuffer = Buffer.from(arrayBuffer);
+        const created_at=new Date();
+
+        const [result] = await pool.query(
+            "INSERT INTO posts (user_id, image_url, caption,created_at) VALUES (?, ?, ?,?)",
+            [userId, imageBuffer, caption,created_at]
+        );
+
+        return new Response(JSON.stringify({ message: "Post created successfully", id: result.insertId }), { status: 201 });
+    } catch (error) {
+        console.error("Error creating post:", error);
+        return new Response(JSON.stringify({ message: "Server error" }), { status: 500 });
+    }
+}
 
 export async function GET() {
   try {
-    const [rows] = await pool.query("SELECT * FROM products"); // Fetch posts
-    
-    return NextResponse.json(rows);
+      const [posts] = await pool.query("SELECT * FROM posts");
+
+      return new Response(JSON.stringify(posts), { status: 200 });
   } catch (error) {
-    console.error("Database Error:", error);
-    return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
+      console.error("Error fetching posts:", error);
+      return new Response(JSON.stringify({ message: "Server error" }), { status: 500 });
   }
-}
-//write a post request with Products interface to add a data
-interface Product {
-    id?: number;
-    name: string;
-    image:string;
-    price: number;
-    description: string;
-    quantity:string
-    created_at:Date
-
-}
-
-export async function POST(request: Request) {
-    try {
-        const product: Product = await request.json();
-        const {id, name,description,image, price,quantity } = product;
-        const created_at = new Date();
-
-        const [result] = await pool.query(
-            "INSERT INTO products (id,name, description,image,price,quantity,created_at) VALUES (?, ?, ?,?,?,?,?)",
-            [id,name,description,image, price,quantity,created_at ]
-        );
-
-        return NextResponse.json({ product }, { status: 201 });
-    } catch (error) {
-        console.error("Database Error:", error);
-        return NextResponse.json({ error: "Failed to add product" }, { status: 500 });
-    }
 }
