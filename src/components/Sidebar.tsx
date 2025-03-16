@@ -1,22 +1,72 @@
-import Link from 'next/link'
+"use client"
 import React from 'react'
+import ModeToggle from './ToggleTheme'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from './ui/sidebar'
+import { Calendar, Home, Search, Settings, SquarePlus } from 'lucide-react'
+import { Button } from './ui/button'
 
 type Props = {}
+const items = [
+    {
+        title: "Home",
+        url: "/home",
+        icon: Home,
+    },
 
-const Sidebar = (props: Props) => {
+    {
+        title: "Calendar",
+        url: "#",
+        icon: Calendar,
+    },
+    {
+        title: "Create",
+        url: "/addPost",
+        icon: SquarePlus,
+    },
+    {
+        title: "Search",
+        url: "#",
+        icon: Search,
+    },
+    {
+        title: "Settings",
+        url: "#",
+        icon: Settings,
+    },
+]
+const Sidebars = (props: Props) => {
     return (
-        <div className='bg-gray-600 flex-col gap-4 pt-4 flex items-center '>
-            <div className='bg-amber-100 w-[80%] py-1 text-center text-black '>
-                <Link href="/">Home</Link>
-            </div>
-            <div className='bg-amber-100 w-[80%] py-1 text-center text-black '>
-                <Link href="/blog">Blog</Link>
-            </div>
-            <div className='bg-amber-100 w-[80%] py-1 text-center text-black '>Gallery</div>
-            <div className='bg-amber-100 w-[80%] py-1 text-center text-black '>Contact Me</div>
+        <SidebarProvider>
 
-        </div>
+            <Sidebar>
+                <SidebarHeader>
+                    Logo <ModeToggle />
+                    <Button variant="secondary" onClick={() => alert("Hello")}>Hello </Button>
+                </SidebarHeader>
+                <SidebarContent>
+                    <SidebarGroup>
+                        <SidebarMenu>
+                            {items.map((item) => (
+                                <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuButton asChild>
+                                        <a href={item.url}>
+                                            <item.icon width='20px' height='24px' />
+                                            <span className='text-lg'>{item.title}</span>
+                                        </a>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroup>
+                </SidebarContent>
+                <SidebarFooter>
+                    Footer
+                </SidebarFooter>
+            </Sidebar>
+        </SidebarProvider>
     )
 }
 
-export default Sidebar
+export default Sidebars
+
+{/* <ModeToggle /> */ }

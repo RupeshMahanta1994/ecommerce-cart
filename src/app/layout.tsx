@@ -1,9 +1,12 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
 import Sidebar from "@/components/Sidebar";
 import { Suspense } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
+import Sidebars from "@/components/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,26 +29,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <header>
-
-          <TopBar />
-        </header>
-        <main className="grid grid-cols-[8%_auto] gap-4  border border-gray-300">
-          <Sidebar />
-          <div>
-            <Suspense fallback={<div>Loading...</div>}>
-              {children}
-            </Suspense>
+    <html lang="en" suppressHydrationWarning>
+      <ThemeProvider attribute='class' defaultTheme="system" enableSystem disableTransitionOnChange>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased grid grid-cols-5`}
+        >
+          <div className="col-span-1   h-[100vh] fixed top-0 left-0">
+            <Sidebars />
           </div>
-        </main>
+          <div className="col-span-4 col-start-2  ">
+
+            {children}
+          </div>
 
 
-
-      </body>
+        </body>
+      </ThemeProvider>
     </html>
   );
 }
